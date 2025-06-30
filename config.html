@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown Wallpaper Configuration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .form-section {
+      padding: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-size: 1.1rem;
+    }
+
+    input[type="text"], input[type="number"], input[type="color"], select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px dashed #e1e8ed;
+      border-radius: 8px;
+      background: #f8f9fa;
+      cursor: pointer;
+    }
+
+    input[type="color"] {
+      height: 50px;
+      cursor: pointer;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-section {
+      background: #f8f9fa;
+      padding: 30px;
+      border-top: 1px solid #e1e8ed;
+    }
+
+    .preview-container {
+      width: 100%;
+      height: 300px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .preview-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      transform: scale(0.3);
+      transform-origin: top left;
+      width: 333.33%;
+      height: 333.33%;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    }
+
+    .btn-secondary {
+      background: #95a5a6;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .help-text {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
+    .countdown-type-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .countdown-option {
+      padding: 15px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .countdown-option:hover {
+      border-color: #3498db;
+    }
+
+    .countdown-option.selected {
+      border-color: #3498db;
+      background: #ecf0f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🕐 Countdown Wallpaper Creator</h1>
+      <p>Create your personalized countdown wallpaper in minutes</p>
+    </div>
+
+    <div class="form-section">
+      <form id="configForm">
+        <div class="form-group">
+          <label for="countdownType">Countdown Type</label>
+          <div class="countdown-type-options">
+            <div class="countdown-option selected" data-type="daily">
+              <h4>Daily Reset</h4>
+              <p>Counts down to midnight every day</p>
+            </div>
+            <div class="countdown-option" data-type="specific">
+              <h4>Specific Date</h4>
+              <p>Counts down to a specific date and time</p>
+            </div>
+            <div class="countdown-option" data-type="weekly">
+              <h4>Weekly Reset</h4>
+              <p>Counts down to the same day each week</p>
+            </div>
+          </div>
+          <input type="hidden" id="countdownType" value="daily">
+        </div>
+
+        <div class="form-group" id="specificDateGroup" style="display: none;">
+          <label for="targetDate">Target Date & Time</label>
+          <input type="datetime-local" id="targetDate" name="targetDate">
+          <div class="help-text">Set the exact date and time you're counting down to</div>
+        </div>
+
+        <div class="form-group" id="weeklyDayGroup" style="display: none;">
+          <label for="weeklyDay">Weekly Reset Day</label>
+          <select id="weeklyDay" name="weeklyDay">
+            <option value="0">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="displayText">Display Text (Optional)</label>
+          <input type="text" id="displayText" name="displayText" placeholder="e.g., 'Days until vacation', 'Time left today'">
+          <div class="help-text">Leave blank to show only the countdown</div>
+        </div>
+
+        <div class="form-group">
+          <label for="backgroundType">Background Type</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="bgColor" name="backgroundType" value="color" checked>
+              <label for="bgColor">Solid Color</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="bgImage" name="backgroundType" value="image">
+              <label for="bgImage">Image</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="colorGroup">
+          <label for="backgroundColor">Background Color</label>
+          <input type="color" id="backgroundColor" name="backgroundColor" value="#000000">
+        </div>
+
+        <div class="form-group" id="imageGroup" style="display: none;">
+          <label for="backgroundImage">Background Image</label>
+          <input type="file" id="backgroundImage" name="backgroundImage" accept="image/*">
+          <div class="help-text">Recommended: High resolution images work best as wallpapers</div>
+        </div>
+
+        <div class="form-group">
+          <label for="textColor">Text Color</label>
+          <input type="color" id="textColor" name="textColor" value="#ffffff">
+        </div>
+
+        <div class="form-group">
+          <label for="fontSize">Countdown Font Size</label>
+          <input type="range" id="fontSize" name="fontSize" min="50" max="200" value="108">
+          <div class="help-text">Current size: <span id="fontSizeValue">108</span>px</div>
+        </div>
+
+        <div class="form-group">
+          <label for="displayTextSize">Display Text Font Size</label>
+          <input type="range" id="displayTextSize" name="displayTextSize" min="20" max="100" value="32">
+          <div class="help-text">Current size: <span id="displayTextSizeValue">32</span>px</div>
+        </div>
+
+        <div class="form-group">
+          <label for="fontFamily">Font Style</label>
+          <select id="fontFamily" name="fontFamily">
+            <option value="Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">Impact (Bold)</option>
+            <option value="'Arial', sans-serif">Arial</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="'Verdana', sans-serif">Verdana</option>
+            <option value="'Georgia', serif">Georgia</option>
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <div class="preview-section">
+      <h3>Preview</h3>
+      <div class="preview-container">
+        <iframe id="previewFrame" class="preview-iframe" src=""></iframe>
+      </div>
+      
+      <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="updatePreview()">Update Preview</button>
+        <button type="button" class="btn btn-primary" onclick="generateWallpaper()">Save Wallpaper</button>
+        <button type="button" class="btn btn-secondary" onclick="openLastWallpaper()" id="openBtn" style="display: none;">Open Wallpaper</button>
+        <button type="button" class="btn btn-secondary" onclick="downloadConfig()">Save Configuration</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Handle countdown type selection
+    document.querySelectorAll('.countdown-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.countdown-option').forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        const type = this.dataset.type;
+        document.getElementById('countdownType').value = type;
+        
+        // Show/hide relevant fields
+        document.getElementById('specificDateGroup').style.display = type === 'specific' ? 'block' : 'none';
+        document.getElementById('weeklyDayGroup').style.display = type === 'weekly' ? 'block' : 'none';
+        
+        // Set default date for specific type
+        if (type === 'specific') {
+          const targetDateInput = document.getElementById('targetDate');
+          if (!targetDateInput.value) {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(12, 0, 0, 0); // Set to noon tomorrow
+            const isoString = tomorrow.toISOString().slice(0, 16); // Format for datetime-local
+            targetDateInput.value = isoString;
+          }
+        }
+        
+        // Auto-update preview when countdown type changes
+        updatePreview();
+      });
+    });
+
+    // Handle background type selection
+    document.querySelectorAll('input[name="backgroundType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const isImage = this.value === 'image';
+        document.getElementById('colorGroup').style.display = isImage ? 'none' : 'block';
+        document.getElementById('imageGroup').style.display = isImage ? 'block' : 'none';
+        // Auto-update preview when background type changes
+        updatePreview();
+      });
+    });
+
+    // Auto-update preview for color and font changes
+    document.getElementById('textColor').addEventListener('change', updatePreview);
+    document.getElementById('backgroundColor').addEventListener('change', updatePreview);
+    document.getElementById('fontFamily').addEventListener('change', updatePreview);
+    document.getElementById('displayText').addEventListener('input', updatePreview);
+    document.getElementById('targetDate').addEventListener('change', updatePreview);
+    document.getElementById('weeklyDay').addEventListener('change', updatePreview);
+
+    // Font size slider
+    document.getElementById('fontSize').addEventListener('input', function() {
+      document.getElementById('fontSizeValue').textContent = this.value;
+      // Auto-update preview when font size changes
+      updatePreview();
+    });
+
+    // Display text font size slider
+    document.getElementById('displayTextSize').addEventListener('input', function() {
+      document.getElementById('displayTextSizeValue').textContent = this.value;
+      // Auto-update preview when display text size changes
+      updatePreview();
+    });
+
+    // Update preview
+    function updatePreview() {
+      const config = getFormData();
+      generatePreview(config);
+    }
+
+    function getFormData() {
+      const formData = new FormData(document.getElementById('configForm'));
+      const config = {};
+      
+      for (let [key, value] of formData.entries()) {
+        config[key] = value;
+      }
+      
+      config.countdownType = document.getElementById('countdownType').value;
+      config.fontSize = document.getElementById('fontSize').value;
+      config.displayTextSize = document.getElementById('displayTextSize').value;
+      config.fontFamily = document.getElementById('fontFamily').value;
+      config.textColor = document.getElementById('textColor').value;
+      config.backgroundColor = document.getElementById('backgroundColor').value;
+      config.backgroundType = document.querySelector('input[name="backgroundType"]:checked').value;
+      
+      // Handle file input
+      const fileInput = document.getElementById('backgroundImage');
+      if (fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          config.backgroundImageData = e.target.result;
+          generatePreview(config);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+        return null; // Will generate preview in the onload callback
+      }
+      
+      return config;
+    }
+
+    function generatePreview(config) {
+      if (!config) return;
+      
+      const previewHtml = generateWallpaperHtml(config);
+      const blob = new Blob([previewHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      document.getElementById('previewFrame').src = url;
+    }
+
+    function generateWallpaperHtml(config) {
+      const backgroundStyle = config.backgroundType === 'image' && config.backgroundImageData 
+        ? `background: url("${config.backgroundImageData}") no-repeat center center fixed; background-size: cover;`
+        : `background-color: ${config.backgroundColor || '#000000'};`;
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown Wallpaper</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      ${backgroundStyle}
+      color: ${config.textColor || '#ffffff'};
+      font-family: ${config.fontFamily || "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"};
+      font-weight: 500;
+      text-transform: uppercase;
+      line-height: 1;
+      text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
+    }
+
+    .countdown {
+      text-align: center;
+    }
+
+    .display-text {
+      font-size: ${config.displayTextSize || 32}px;
+      margin-bottom: ${Math.round((config.displayTextSize || 32) * 1.2)}px;
+      opacity: 0.9;
+      line-height: 1.2;
+    }
+
+    .time {
+      font-size: ${Math.round((config.fontSize || 108) * 0.8)}px;
+      text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.6);
+      line-height: 1.1;
+    }
+
+    .time-unit {
+      display: inline-block;
+      width: ${Math.round((config.fontSize || 108) * 1.1)}px;
+      text-align: center;
+      margin: 0 ${Math.round((config.fontSize || 108) * 0.05)}px;
+      min-width: ${Math.round((config.fontSize || 108) * 0.8)}px;
+    }
+
+    .time-unit.minutes {
+      width: ${Math.round((config.fontSize || 108) * 1.0)}px;
+    }
+
+    .time-unit.hours {
+      width: ${Math.round((config.fontSize || 108) * 0.9)}px;
+      min-width: ${Math.round((config.fontSize || 108) * 0.9)}px;
+    }
+
+    .time-unit.seconds {
+      width: ${Math.round((config.fontSize || 108) * 0.9)}px;
+    }
+
+    .semicolon {
+      width: ${Math.round((config.fontSize || 108) * 0.15)}px;
+      display: inline-block;
+      text-align: center;
+      margin: 0 ${Math.round((config.fontSize || 108) * 0.02)}px;
+    }
+  </style>
+</head>
+<body>
+  <div class="countdown">
+    ${config.displayText ? `<div class="display-text">${config.displayText}</div>` : ''}
+    <div id="time" class="time"></div>
+  </div>
+
+  <script>
+    function updateCountdown() {
+      const now = new Date();
+      let targetTime;
+      
+      ${generateCountdownLogic(config)}
+      
+      const timeLeft = Math.max(0, targetTime - now);
+      const totalHours = Math.floor(timeLeft / (1000 * 60 * 60));
+      const hours = String(totalHours).padStart(2, '0');
+      const minutes = String(Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+      const seconds = String(Math.floor((timeLeft % (1000 * 60)) / 1000)).padStart(2, '0');
+      const milliseconds = String(Math.floor((timeLeft % 1000) / 10)).padStart(2, '0');
+
+      // Dynamically adjust width based on hours length
+      const hoursWidth = Math.max(${Math.round((config.fontSize || 108) * 0.9)}, hours.length * ${Math.round((config.fontSize || 108) * 0.45)});
+      
+      document.getElementById('time').innerHTML =
+        \`<span class="time-unit hours" style="width: \${hoursWidth}px">\${hours}</span><span class="semicolon">:</span>\` +
+        \`<span class="time-unit minutes">\${minutes}</span><span class="semicolon">:</span>\` +
+        \`<span class="time-unit seconds">\${seconds}</span><span class="semicolon">:</span>\` +
+        \`<span class="time-unit">\${milliseconds}</span>\`;
+    }
+
+    setInterval(updateCountdown, 10);
+    updateCountdown();
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function generateCountdownLogic(config) {
+      switch (config.countdownType) {
+        case 'daily':
+          return `
+            targetTime = new Date();
+            targetTime.setHours(24, 0, 0, 0);
+          `;
+        case 'specific':
+          return `
+            targetTime = new Date('${config.targetDate}');
+            if (isNaN(targetTime.getTime())) {
+              // If no date is set or invalid, default to tomorrow
+              targetTime = new Date();
+              targetTime.setDate(targetTime.getDate() + 1);
+              targetTime.setHours(0, 0, 0, 0);
+            }
+          `;
+        case 'weekly':
+          return `
+            targetTime = new Date();
+            const targetDay = ${config.weeklyDay || 0};
+            const currentDay = targetTime.getDay();
+            const daysUntilTarget = (targetDay - currentDay + 7) % 7;
+            targetTime.setDate(targetTime.getDate() + (daysUntilTarget || 7));
+            targetTime.setHours(0, 0, 0, 0);
+          `;
+        default:
+          return `
+            targetTime = new Date();
+            targetTime.setHours(24, 0, 0, 0);
+          `;
+      }
+    }
+
+    function generateWallpaper() {
+      const config = getFormData();
+      if (!config) {
+        // If config is null, it means we're waiting for file processing
+        setTimeout(generateWallpaper, 100);
+        return;
+      }
+      
+      const wallpaperHtml = generateWallpaperHtml(config);
+      
+      // Check if running in Electron
+      if (window.electronAPI) {
+        // Use Electron's save dialog
+        window.electronAPI.saveWallpaper(wallpaperHtml, 'countdown-wallpaper.html')
+          .then(result => {
+            if (result.success && !result.cancelled) {
+              alert('Wallpaper saved successfully!\n\nTo use as wallpaper:\n1. Open the saved file in fullscreen browser (F11)\n2. Use Windows + P to duplicate displays\n3. Or use third-party wallpaper software');
+              
+              // Show open button
+              document.getElementById('openBtn').style.display = 'inline-block';
+              window.lastWallpaperPath = result.path;
+            }
+          })
+          .catch(error => {
+            alert('Error saving wallpaper: ' + error);
+          });
+      } else {
+        // Fallback to browser download
+        downloadFile(wallpaperHtml, 'countdown-wallpaper.html', 'text/html');
+      }
+    }
+
+    function openLastWallpaper() {
+      if (window.lastWallpaperPath && window.electronAPI) {
+        window.electronAPI.openWallpaper(window.lastWallpaperPath);
+      }
+    }
+
+    function downloadConfig() {
+      const config = getFormData();
+      if (!config) return;
+      
+      const configJson = JSON.stringify(config, null, 2);
+      downloadFile(configJson, 'wallpaper-config.json', 'application/json');
+    }
+
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Initialize preview
+    window.addEventListener('load', function() {
+      updatePreview();
+    });
+  </script>
+</body>
+</html>
