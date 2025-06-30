@@ -77,7 +77,7 @@ MIT License - Free to use and modify for any purpose.
 ### 🎨 Configuration Interface
 ![Configuration Interface](config-preview-1.png)
 ![Configuration Interface](config-preview-2.png)
-![Configuration Interface](config-preview-3.png)
+![Configuration Interface](countdown-preview.png)
 
 ### ⏱️ Countdown Wallpaper Preview
-![Countdown Wallpaper](countdown-preview.png)
+![Countdown Wallpaper](config-preview-3.png)
