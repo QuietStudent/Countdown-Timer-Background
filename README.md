@@ -75,9 +75,9 @@ MIT License - Free to use and modify for any purpose.
 ## 📸 Screenshots
 
 ### 🎨 Configuration Interface
-![Configuration Interface](assets/config-preview-1.png)
-![Configuration Interface](assets/config-preview-2.png)
-![Configuration Interface](assets/config-preview-3.png)
+![Configuration Interface](config-preview-1.png)
+![Configuration Interface](config-preview-2.png)
+![Configuration Interface](config-preview-3.png)
 
 ### ⏱️ Countdown Wallpaper Preview
-![Countdown Wallpaper](assets/countdown-preview.png)
+![Countdown Wallpaper](countdown-preview.png)
