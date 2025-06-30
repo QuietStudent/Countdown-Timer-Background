@@ -310,7 +310,6 @@
       <div class="button-group">
         <button type="button" class="btn btn-secondary" onclick="updatePreview()">Update Preview</button>
         <button type="button" class="btn btn-primary" onclick="generateWallpaper()">Save Wallpaper</button>
-        <button type="button" class="btn btn-secondary" onclick="openLastWallpaper()" id="openBtn" style="display: none;">Open Wallpaper</button>
         <button type="button" class="btn btn-secondary" onclick="downloadConfig()">Save Configuration</button>
       </div>
     </div>
@@ -382,8 +381,9 @@
 
     // Update preview
     function updatePreview() {
-      const config = getFormData();
-      generatePreview(config);
+      getFormDataWithImage(function(config) {
+        generatePreview(config);
+      });
     }
 
     function getFormData() {
@@ -402,19 +402,24 @@
       config.backgroundColor = document.getElementById('backgroundColor').value;
       config.backgroundType = document.querySelector('input[name="backgroundType"]:checked').value;
       
+      return config;
+    }
+
+    function getFormDataWithImage(callback) {
+      const config = getFormData();
+      
       // Handle file input
       const fileInput = document.getElementById('backgroundImage');
-      if (fileInput.files[0]) {
+      if (fileInput.files[0] && config.backgroundType === 'image') {
         const reader = new FileReader();
         reader.onload = function(e) {
           config.backgroundImageData = e.target.result;
-          generatePreview(config);
+          callback(config);
         };
         reader.readAsDataURL(fileInput.files[0]);
-        return null; // Will generate preview in the onload callback
+      } else {
+        callback(config);
       }
-      
-      return config;
     }
 
     function generatePreview(config) {
@@ -577,49 +582,24 @@
     }
 
     function generateWallpaper() {
-      const config = getFormData();
-      if (!config) {
-        // If config is null, it means we're waiting for file processing
-        setTimeout(generateWallpaper, 100);
-        return;
-      }
-      
-      const wallpaperHtml = generateWallpaperHtml(config);
-      
-      // Check if running in Electron
-      if (window.electronAPI) {
-        // Use Electron's save dialog
-        window.electronAPI.saveWallpaper(wallpaperHtml, 'countdown-wallpaper.html')
-          .then(result => {
-            if (result.success && !result.cancelled) {
-              alert('Wallpaper saved successfully!\n\nTo use as wallpaper:\n1. Open the saved file in fullscreen browser (F11)\n2. Use Windows + P to duplicate displays\n3. Or use third-party wallpaper software');
-              
-              // Show open button
-              document.getElementById('openBtn').style.display = 'inline-block';
-              window.lastWallpaperPath = result.path;
-            }
-          })
-          .catch(error => {
-            alert('Error saving wallpaper: ' + error);
-          });
-      } else {
-        // Fallback to browser download
+      getFormDataWithImage(function(config) {
+        const wallpaperHtml = generateWallpaperHtml(config);
+        
+        // Always use browser download since we're running in browser
         downloadFile(wallpaperHtml, 'countdown-wallpaper.html', 'text/html');
-      }
-    }
-
-    function openLastWallpaper() {
-      if (window.lastWallpaperPath && window.electronAPI) {
-        window.electronAPI.openWallpaper(window.lastWallpaperPath);
-      }
+        
+        // Show success message
+        alert('Wallpaper downloaded successfully!\n\nTo use as wallpaper:\n1. Open the downloaded HTML file\n2. Press F11 for fullscreen\n3. Or import into Lively Wallpaper or similar software');
+      });
     }
 
     function downloadConfig() {
-      const config = getFormData();
-      if (!config) return;
-      
-      const configJson = JSON.stringify(config, null, 2);
-      downloadFile(configJson, 'wallpaper-config.json', 'application/json');
+      getFormDataWithImage(function(config) {
+        const configJson = JSON.stringify(config, null, 2);
+        downloadFile(configJson, 'wallpaper-config.json', 'application/json');
+        
+        alert('Configuration saved successfully!\n\nYou can load this configuration later to recreate the same wallpaper settings.');
+      });
     }
 
     function downloadFile(content, filename, mimeType) {
